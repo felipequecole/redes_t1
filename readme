@@ -1,0 +1,7 @@
+COMO ACESSAR O SERVIDOR?
+Para acessar via ssh, basta digitar o comando ssh aluno@192.168.56.103 [ou o ip rodando enp0s8]
+Para transferir arquivos, utilizar sftp, comando sftp aluno@192.168.56.103
+
+LOCAL DOS ARQUIVOS:
+-> O arquivo webserver.py deve estar na pasta /usr/lib/cgi-bin
+-> Os arquivos html e css devem estar na pasta /var/www/html
