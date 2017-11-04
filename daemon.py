@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 from socket import *
 
@@ -14,6 +14,10 @@ serverSocket.bind(("",serverPort))
 #Espera pelos pacotes do cliente
 serverSocket.listen(1)
 
+bar = "|"
+pv = ";"
+maior = ">"
+menor = "<"
 ps = "1 "
 df = "2 "
 finger = "3 "
@@ -24,6 +28,14 @@ while True:
 	connectionSocket, addr = serverSocket.accept()
 	sentence = connectionSocket.recv(1024)
 	sentence = sentence.replace("REQUEST ","")
+	if bar in sentence:
+		sentence = sentence.replace(bar, "")
+	if pv in sentence:
+		sentence = sentence.replace(pv, "")
+	if maior in sentece:
+		sentence = sentence.replace(maior, "")
+	if menor in sentece:
+		sentence = sentence.replace(menor, "")
 	if ps in sentence:
 		sentence = sentence.replace(ps,"ps")
 		numero = ps
