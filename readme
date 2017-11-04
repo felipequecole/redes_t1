@@ -5,3 +5,7 @@ Para transferir arquivos, utilizar sftp, comando sftp aluno@192.168.56.103
 LOCAL DOS ARQUIVOS:
 -> A pasta cgi-bin deve estar na pasta /usr/lib/
 -> Os arquivos html e css devem estar na pasta /var/www/html
+
+COMO RODAR: 
+-> Primeiro, é necessário "ligar" o daemon, para isso, basta dar o comando "python daemon.py &" a partir da home
+-> Depois, basta acessar o http://192.168.56.103 e inserir os comandos
