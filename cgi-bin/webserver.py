@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 import cgitb
 import cgi
@@ -18,17 +18,20 @@ print('</head>')
 print('<body>')
 
 comandos = {
-		'ps' : '1 ', 
-		'df' : '2 ', 
-		'finger': '3 ', 
+		'ps' : '1 ',
+		'df' : '2 ',
+		'finger': '3 ',
 		'uptime': '4 '
 	}
 
 for i in range (1,4):
-	for comando in comandos: 
+	for comando in comandos:
 		if ('maq' + str(i) + '_' + comando) in form:
 			print("<p>")
-			message = backend.sendMsg(comandos[comando])
+			if(form.getvalue('maq' + str(i) + '-' + comando)):
+				message = backend.sendMsg(comandos[comando] +' '+' '+ form.getvalue('maq' + str(i) + '-' + comando))
+			else:
+				message = backend.sendMsg(comandos[comando])
 			split = message.split('\n')
 			for ms in split:
 				print(ms)
