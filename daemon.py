@@ -17,7 +17,6 @@ serverSocket.listen(1)
 bar = "|"
 pv = ";"
 maior = ">"
-menor = "<"
 ps = "1 "
 df = "2 "
 finger = "3 "
@@ -34,8 +33,6 @@ while True:
 		sentence = sentence.replace(pv, "")
 	if maior in sentece:
 		sentence = sentence.replace(maior, "")
-	if menor in sentece:
-		sentence = sentence.replace(menor, "")
 	if ps in sentence:
 		sentence = sentence.replace(ps,"ps")
 		numero = ps
