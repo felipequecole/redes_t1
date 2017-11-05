@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 from socket import *
 
@@ -10,7 +10,15 @@ import sys, io, struct
 def parse_header(message):
 	header = io.BytesIO(message)
 	header.read(36) # so jogando fora parte do header rs
-	return str(struct.unpack('!i', header.read(4))[0])
+	sentence = str(struct.unpack('!i', header.read(4))[0])
+	sentence += '  '
+	header.read(8) #joga o checksum fora
+	op = header.read()
+	cmd = ''
+	for i in op:
+		cmd += str(struct.unpack('!c', i)[0])
+	sentence += cmd
+	return sentence
 
 
 
@@ -66,8 +74,7 @@ while True:
 
 	# executa num subcomando
 	comando = subprocess.Popen(sentence, stdout=subprocess.PIPE, shell=True)
-	(resposta, err) = comando.communicate()	
+	(resposta, err) = comando.communicate()
 	resposta = "RESPONSE " + numero + resposta
 	connectionSocket.send(resposta)
 	connectionSocket.close()
-

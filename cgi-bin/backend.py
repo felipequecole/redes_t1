@@ -18,15 +18,17 @@ def create_header(comando):
 	destination = '192.168.56.101' # TODO: verificar como pegar esse IP
 	options = ''
 	for i in range(len(comando)):
-		if(i != 0 and i != len(comando)-1)
+		if(i != 0 and i != len(comando)-1):
 			options += comando[i] + ' '
-		if(i == len(comando)-1)
+		if(i == len(comando)-1):
 			options += comando[i]
 	header = struct.pack('!hhiQ', protocol_version, ihl, type_of_service, total_length)
 	header += struct.pack('!Qccc', identification, '1', '1', '1')
 	for p in range (5):
 		header += struct.pack('!c', '0')
 	header += struct.pack('!iiQ', ttl, protocol, checksum)
+	for o in options:
+		header += struct.pack('!c', o)
 	return header
 	# por enquanto vai ignorar a parte de source e dest address
 	# por enquanto não vou mandar com os argumentos - só pra testar
