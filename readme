@@ -7,5 +7,5 @@ LOCAL DOS ARQUIVOS:
 -> Os arquivos html e css devem estar na pasta /var/www/html
 
 COMO RODAR: 
--> Primeiro, é necessário "ligar" o daemon, para isso, basta dar o comando "python daemon.py &" a partir da home
+-> Primeiro, é necessário "ligar" o daemon, para isso, basta dar o comando "python daemon.py --port <Numero da porta> &" a partir da home
 -> Depois, basta acessar o http://192.168.56.103 e inserir os comandos
