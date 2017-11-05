@@ -1,17 +1,40 @@
 # -*- coding: utf-8 -*- 
 
 from socket import *
+import struct
 
-def sendMsg(comando):
+
+def create_header(comando):
+	protocol_version = 2
+	ihl = 16
+	type_of_service = 0
+	total_length = 99
+	identification = 1
+	ttl = 10
+	protocol = int(comando)
+	checksum = 282	# TODO: checksum
+	header = struct.pack('!hhiQ', protocol_version, ihl, type_of_service, total_length)
+	header += struct.pack('!Qccc', identification, '1', '1', '1')
+	for p in range (5):
+		header += struct.pack('!c', '0')
+	header += struct.pack('!iiQ', ttl, protocol, checksum)
+	return header
+	# por enquanto vai ignorar a parte de source e dest address
+	# por enquanto não vou mandar com os argumentos - só pra testar
+
+def parse_message(message):
+	pass
+
+def sendMsg(comando, maquina):
 	serverName = gethostname()
-	serverPort = 9003  # ainda nao define a porta por parametro, fixei na 9003 para testes
+	serverPort = 9000 + maquina  # ainda nao define a porta por parametro, fixei na 9003 para testes
 
 	clientSocket = socket(AF_INET,SOCK_STREAM)
 	
 	try: 
     		clientSocket.connect((serverName, serverPort))
     		if comando:
-      			clientSocket.send(comando)
+      			clientSocket.send(create_header(comando))
 			comando = ""
 			dados = clientSocket.recv(1024) 
 			dados = testar_dados(dados) 

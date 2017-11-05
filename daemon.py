@@ -4,7 +4,15 @@ from socket import *
 
 import subprocess
 import string
-import sys
+import sys, io, struct
+
+
+def parse_header(message):
+	header = io.BytesIO(message)
+	header.read(36) # so jogando fora parte do header rs
+	return str(struct.unpack('!i', header.read(4))[0])
+
+
 
 serverPort = 9001
 try:
@@ -33,14 +41,15 @@ menor = "<"
 while True:
 	connectionSocket, addr = serverSocket.accept()
 	sentence = connectionSocket.recv(1024)
-	sentence = sentence.replace("REQUEST ","")
+	sentence = parse_header(sentence) + ' '
+	numero = 0
 	if bar in sentence:
 		sentence = sentence.replace(bar, "")
 	if pv in sentence:
 		sentence = sentence.replace(pv, "")
-	if maior in sentece:
+	if maior in sentence:
 		sentence = sentence.replace(maior, "")
-	if menor in sentece:
+	if menor in sentence:
 		sentence = sentence.replace(menor, "")
 	if ps in sentence:
 		sentence = sentence.replace(ps,"ps")

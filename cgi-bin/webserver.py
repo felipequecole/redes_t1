@@ -29,9 +29,9 @@ for i in range (1,4):
 		if ('maq' + str(i) + '_' + comando) in form:
 			print("<p>")
 			if(form.getvalue('maq' + str(i) + '-' + comando)):
-				message = backend.sendMsg(comandos[comando] +' '+' '+ form.getvalue('maq' + str(i) + '-' + comando))
+				message = backend.sendMsg(comandos[comando] +' '+' '+ form.getvalue('maq' + str(i) + '-' + comando), i)
 			else:
-				message = backend.sendMsg(comandos[comando])
+				message = backend.sendMsg(comandos[comando], i)
 			split = message.split('\n')
 			for ms in split:
 				print(ms)
