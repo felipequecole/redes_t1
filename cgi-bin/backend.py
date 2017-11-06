@@ -14,7 +14,7 @@ def create_header(comando):
 	ttl = 10
 	protocol = int(comando[0])
 	checksum = 282	# TODO: checksum
-	source = '127.0.0.1'
+	source = socket.gethostname(socket.gethostname())
 	destination = '192.168.56.101' # TODO: verificar como pegar esse IP
 	options = ''
 	for i in range(len(comando)):
@@ -31,7 +31,6 @@ def create_header(comando):
 		header += struct.pack('!c', o)
 	return header
 	# por enquanto vai ignorar a parte de source e dest address
-	# por enquanto não vou mandar com os argumentos - só pra testar
 
 def parse_message(message):
 	pass
