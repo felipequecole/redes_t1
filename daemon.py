@@ -9,10 +9,21 @@ import sys, io, struct
 
 def parse_header(message):
 	header = io.BytesIO(message)
-	header.read(36) # so jogando fora parte do header rs
+	protocol_version = str(struct.unpack('!h',header.read(2))[0])
+	ihl = str(struct.unpack('!h',header.read(2))[0])
+	type_of_service = str(struct.unpack('!i', header.read(4))[0])
+	total_length = str(struct.unpack('!Q', header.read(8))[0])
+	identification = str(struct.unpack('!Q', header.read(8))[0])
+	flags = []
+	for i in range(3):
+		flags.append(str(struct.unpack('!c', header.read(1))[0]))
+	offset = []
+	for j in range(5):
+		offset.append(str(struct.unpack('!c', header.read(1))[0]))
+	ttl = str(struct.unpack('!i', header.read(4))[0])
 	sentence = str(struct.unpack('!i', header.read(4))[0])
 	sentence += '  '
-	header.read(8) #joga o checksum fora
+	checksum = str(struct.unpack('!Q', header.read(8))[0])
 	op = header.read()
 	cmd = ''
 	for i in op:
