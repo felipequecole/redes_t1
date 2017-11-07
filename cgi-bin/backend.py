@@ -4,6 +4,21 @@ from socket import *
 import struct
 
 
+def crc16(dados):
+	dados = bytearray(data)
+	crcv = 0xFFFF
+	polynomial = 0xFFFF
+	for b in data:
+		crcv ^= ord(b)
+		for x in range (8):
+			if(crcv & 1):
+				crcv = (crcv >> 1) ^ polynomial
+			else:
+				crcv >>= 1
+	crcv ^= 0xFFFF
+	return crcv
+
+
 def create_header(comando):
 	comando = comando.split(' ')
 	protocol_version = 2
@@ -14,7 +29,7 @@ def create_header(comando):
 	ttl = 10
 	protocol = int(comando[0])
 	checksum = 282	# TODO: checksum
-	source = socket.gethostname(socket.gethostname())
+	source = socket.gethostbyname(socket.gethostname())
 	destination = '192.168.56.101' # TODO: verificar como pegar esse IP
 	options = ''
 	for i in range(len(comando)):
@@ -27,6 +42,7 @@ def create_header(comando):
 	for p in range (5):
 		header += struct.pack('!c', '0')
 	header += struct.pack('!iiQ', ttl, protocol, checksum)
+	# TODO adicionar os address no header
 	for o in options:
 		header += struct.pack('!c', o)
 	return header
