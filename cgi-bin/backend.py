@@ -4,19 +4,8 @@ from socket import *
 import struct
 
 
-def crc16(dados):
-	dados = bytearray(data)
-	crcv = 0xFFFF
-	polynomial = 0xFFFF
-	for b in data:
-		crcv ^= ord(b)
-		for x in range (8):
-			if(crcv & 1):
-				crcv = (crcv >> 1) ^ polynomial
-			else:
-				crcv >>= 1
-	crcv ^= 0xFFFF
-	return crcv
+def checksum(dados):
+	
 
 
 def create_header(comando):
