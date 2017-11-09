@@ -3,6 +3,24 @@
 from socket import *
 import struct
 
+
+def carry_add(a,b):
+	c = a + b
+	return ((c & 0xffff) + (c >> 16))
+
+
+def checksum(dados, op):
+	s = 0
+	for i in range(0, len(dados), 2):
+		w = ord(dados[i]) + (ord(dados[i+1]) << 8)
+		s = carry_add(s, w)
+	if(op):
+		return s & 0xffff
+	else:
+		return ~s & 0xffff
+
+
+
 def create_header(comando):
 	comando = comando.split(' ')
 	protocol_version = 2
@@ -12,7 +30,6 @@ def create_header(comando):
 	identification = 1
 	ttl = 10
 	protocol = int(comando[0])
-	checksum = 282	# TODO: checksum
 	source = inet_aton(gethostbyname(gethostname()))
 	destination = '192.168.56.101' # TODO: verificar como pegar esse IP
 	options = ''
@@ -25,6 +42,10 @@ def create_header(comando):
 	header += struct.pack('!Qccc', identification, '1', '1', '1')
 	for p in range (5):
 		header += struct.pack('!c', '0')
+	headerChecksum = ''
+	for o in options:
+		 headerChecksum = header + struct.pack('!c', o)
+	checksum = checksum(headerChecksum, 0)
 	header += struct.pack('!iiQ', ttl, protocol, checksum)
 	# TODO adicionar os address no header
 	for o in options:
