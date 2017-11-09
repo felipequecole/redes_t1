@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from socket import *
-
 import subprocess
 import string
 import sys, io, struct
+import thread
 
+# class Daemon(threading.Thread):
+# 	def run(self, socket):
+#
 
 def parse_header(message):
 	header = io.BytesIO(message)
@@ -30,6 +33,33 @@ def parse_header(message):
 		cmd += str(struct.unpack('!c', i)[0])
 	sentence += cmd
 	return sentence
+
+def send_packet(socket):
+	packet = socket.recv(1024)
+	sentence = parse_header(packet) + ' '
+	if bar in sentence:
+		sentence = sentence.replace(bar, "")
+	if pv in sentence:
+		sentence = sentence.replace(pv, "")
+	if maior in sentence:
+		sentence = sentence.replace(maior, "")
+	if menor in sentence:
+		sentence = sentence.replace(menor, "")
+	if ps in sentence:
+		sentence = sentence.replace(ps,"ps")
+	if df in sentence:
+		sentence = sentence.replace(df,"df")
+	if finger in sentence:
+		sentence = sentence.replace(finger,"finger")
+	if uptime in sentence:
+		sentence = sentence.replace(uptime,"uptime")
+
+	# executa num subcomando
+	comando = subprocess.Popen(sentence, stdout=subprocess.PIPE, shell=True)
+	(resposta, err) = comando.communicate()
+	resposta = "RESPONSE " + resposta
+	connectionSocket.send(resposta)
+	connectionSocket.close()
 
 
 
@@ -59,33 +89,7 @@ menor = "<"
 
 while True:
 	connectionSocket, addr = serverSocket.accept()
-	sentence = connectionSocket.recv(1024)
-	sentence = parse_header(sentence) + ' '
-	numero = 0
-	if bar in sentence:
-		sentence = sentence.replace(bar, "")
-	if pv in sentence:
-		sentence = sentence.replace(pv, "")
-	if maior in sentence:
-		sentence = sentence.replace(maior, "")
-	if menor in sentence:
-		sentence = sentence.replace(menor, "")
-	if ps in sentence:
-		sentence = sentence.replace(ps,"ps")
-		numero = ps
-	if df in sentence:
-		sentence = sentence.replace(df,"df")
-		numero = df
-	if finger in sentence:
-		sentence = sentence.replace(finger,"finger")
-		numero = finger
-	if uptime in sentence:
-		sentence = sentence.replace(uptime,"uptime")
-		numero = uptime
-
-	# executa num subcomando
-	comando = subprocess.Popen(sentence, stdout=subprocess.PIPE, shell=True)
-	(resposta, err) = comando.communicate()
-	resposta = "RESPONSE " + numero + resposta
-	connectionSocket.send(resposta)
-	connectionSocket.close()
+	try:
+		thread.start_new_thread(send_packet, (connectionSocket,))
+	except Exception as e:
+		raise

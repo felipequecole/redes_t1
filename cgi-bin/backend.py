@@ -3,6 +3,7 @@
 from socket import *
 import struct
 
+
 def carry_add(a,b):
 	c = a + b
 	return ((c & 0xffff) + (c >> 16))
@@ -29,7 +30,7 @@ def create_header(comando):
 	identification = 1
 	ttl = 10
 	protocol = int(comando[0])
-	source = socket.gethostbyname(socket.gethostname())
+	source = inet_aton(gethostbyname(gethostname()))
 	destination = '192.168.56.101' # TODO: verificar como pegar esse IP
 	options = ''
 	for i in range(len(comando)):
@@ -60,21 +61,23 @@ def sendMsg(comando, maquina):
 	serverPort = 9000 + maquina  # ainda nao define a porta por parametro, fixei na 9003 para testes
 
 	clientSocket = socket(AF_INET,SOCK_STREAM)
+	if (len(comando) > 0):
+		header = create_header(comando)
+		if (len(header) > 0):
+			try:
+				clientSocket.connect((serverName, serverPort))
+				clientSocket.send(header)
+				comando = ""
+				dados = clientSocket.recv(10240)
+				dados = testar_dados(dados)
+				clientSocket.close()
 
-	try:
-    		clientSocket.connect((serverName, serverPort))
-    		if comando:
-      			clientSocket.send(create_header(comando))
-			comando = ""
-			dados = clientSocket.recv(1024)
-			dados = testar_dados(dados)
+			except Exception:
+				dados = "Socket sem conexao!"
 		else:
-			dados = "Impossivel gerar comando!"
-
-		clientSocket.close()
-
-	except Exception:
-		dados = "Socket sem conexao!"
+			dados = "Erro ao criar cabeçalho!"
+	else:
+		dados = "Comando inválido!"
 
 	return dados
 
