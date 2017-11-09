@@ -9,7 +9,7 @@ def carry_add(a,b):
 	return ((c & 0xffff) + (c >> 16))
 
 
-def checksum(dados, op):
+def calc_checksum(dados, op):
 	s = 0
 	for i in range(0, len(dados), 2):
 		w = ord(dados[i]) + (ord(dados[i+1]) << 8)
@@ -45,7 +45,7 @@ def create_header(comando):
 	headerChecksum = ''
 	for o in options:
 		 headerChecksum = header + struct.pack('!c', o)
-	checksum = checksum(headerChecksum, 0)
+	checksum = calc_checksum(headerChecksum, 0)
 	header += struct.pack('!iiQ', ttl, protocol, checksum)
 	# TODO adicionar os address no header
 	for o in options:
