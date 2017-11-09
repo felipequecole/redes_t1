@@ -3,21 +3,21 @@
 from socket import *
 import struct
 
+# def carry_add(a,b):
+# 	c = a + b
+# 	return ((a + b & 0xffff) + (a + b >> 16))
 
-def carry_add(a,b):
-	c = a + b
-	return ((c & 0xffff) + (c >> 16))
 
-
-def calc_checksum(dados, op):
-	s = 0
-	for i in range(0, len(dados), 2):
-		w = ord(dados[i]) + (ord(dados[i+1]) << 8)
-		s = carry_add(s, w)
+def checksum(dados, op):
+	somaTotal = 0 #inicializa a soma total dos dados com 0
+	for i in range(0, len(dados), 2): #percorre a string de byte passada como parametro de 2 em 2 bytes (16 em 16 bits)
+		palavra = ord(dados[i]) + (ord(dados[i+1]) << 8) #concatena 2 bytes formando uma palavra de 16 bits
+		somaTotal = ((somaTotal + palavra & 0xffff) + (somaTotal + palavra >> 16)) #soma ao total a soma total a próxima palavra
+		# s = carry_add(s, w)
 	if(op):
-		return s & 0xffff
+		return somaTotal & 0xffff #retorna o valor da soma total sem invertir os bits
 	else:
-		return ~s & 0xffff
+		return ~somaTotal & 0xffff #retorna o valor da soma total invertendo todos os bits
 
 
 
@@ -45,8 +45,10 @@ def create_header(comando):
 	headerChecksum = ''
 	for o in options:
 		 headerChecksum = header + struct.pack('!c', o)
-	checksum = calc_checksum(headerChecksum, 0)
+	checksum = checksum(headerChecksum+source+destination, 0)
 	header += struct.pack('!iiQ', ttl, protocol, checksum)
+	header += source
+	header += destination
 	# TODO adicionar os address no header
 	for o in options:
 		header += struct.pack('!c', o)
