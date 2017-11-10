@@ -47,8 +47,8 @@ def create_header(comando):
 		headerChecksum += struct.pack('!c', o)
 	checksum = calc_checksum(headerChecksum+source+destination, 0)
 	header += struct.pack('!iiQ', ttl, protocol, checksum)
-	# header += source
-	# header += destination
+	header += source
+	header += destination
 	# # TODO adicionar os address no header
 	for o in options:
 		header += struct.pack('!c', o)

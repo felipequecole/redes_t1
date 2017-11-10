@@ -28,9 +28,9 @@ def parse_header(message):
 	sentence += '  '
 	print sentence
 	checksum = str(struct.unpack('!Q', header.read(8))[0])
-	# soucer = str(struct.unpack('!I',header.read(4))[0])
-	# dest = str(struct.unpack('!I',header.read(4))[0])
-	# print dest
+	soucer = inet_ntoa(header.read(4))
+	dest = inet_ntoa(header.read(4))
+	print dest
 	op = header.read()
 	cmd = ''
 	for i in op:
