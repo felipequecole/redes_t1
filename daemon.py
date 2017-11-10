@@ -26,11 +26,16 @@ def parse_header(message):
 	ttl = str(struct.unpack('!i', header.read(4))[0])
 	sentence = str(struct.unpack('!i', header.read(4))[0])
 	sentence += '  '
+	print sentence
 	checksum = str(struct.unpack('!Q', header.read(8))[0])
+	# soucer = str(struct.unpack('!I',header.read(4))[0])
+	# dest = str(struct.unpack('!I',header.read(4))[0])
+	# print dest
 	op = header.read()
 	cmd = ''
 	for i in op:
 		cmd += str(struct.unpack('!c', i)[0])
+		print cmd
 	sentence += cmd
 	return sentence
 

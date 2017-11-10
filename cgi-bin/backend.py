@@ -8,7 +8,7 @@ import struct
 # 	return ((a + b & 0xffff) + (a + b >> 16))
 
 
-def checksum(dados, op):
+def calc_checksum(dados, op):
 	somaTotal = 0 #inicializa a soma total dos dados com 0
 	for i in range(0, len(dados), 2): #percorre a string de byte passada como parametro de 2 em 2 bytes (16 em 16 bits)
 		palavra = ord(dados[i]) + (ord(dados[i+1]) << 8) #concatena 2 bytes formando uma palavra de 16 bits
@@ -31,7 +31,7 @@ def create_header(comando):
 	ttl = 10
 	protocol = int(comando[0])
 	source = inet_aton(gethostbyname(gethostname()))
-	destination = '192.168.56.101' # TODO: verificar como pegar esse IP
+	destination = inet_aton('192.168.56.101') # TODO: verificar como pegar esse IP
 	options = ''
 	for i in range(len(comando)):
 		if(i != 0 and i != len(comando)-1):
@@ -42,14 +42,14 @@ def create_header(comando):
 	header += struct.pack('!Qccc', identification, '1', '1', '1')
 	for p in range (5):
 		header += struct.pack('!c', '0')
-	headerChecksum = ''
+	headerChecksum = header
 	for o in options:
-		 headerChecksum = header + struct.pack('!c', o)
-	checksum = checksum(headerChecksum+source+destination, 0)
+		headerChecksum += struct.pack('!c', o)
+	checksum = calc_checksum(headerChecksum+source+destination, 0)
 	header += struct.pack('!iiQ', ttl, protocol, checksum)
-	header += source
-	header += destination
-	# TODO adicionar os address no header
+	# header += source
+	# header += destination
+	# # TODO adicionar os address no header
 	for o in options:
 		header += struct.pack('!c', o)
 	return header
