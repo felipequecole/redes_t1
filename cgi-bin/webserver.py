@@ -25,22 +25,27 @@ comandos = {
 	}
 
 for i in range (1,4):
-	print('<div class="col-sm-6">')
+	isInDiv = False
 	for comando in comandos:
 		if ('maq' + str(i) + '_' + comando) in form:
+			if (isInDiv == False):
+				print('<div class="col-sm-12" id="col-' + str(i)+ '">')
+				isInDiv = True
 			# print("<p>")
 			if(form.getvalue('maq' + str(i) + '-' + comando)):
 				message = backend.sendMsg(comandos[comando] +' '+' '+ form.getvalue('maq' + str(i) + '-' + comando), i)
 			else:
 				message = backend.sendMsg(comandos[comando], i)
-			split = message.split('\n')
+			for i in message.keys():
+				print('<p>' + i + ' : '+str(message[i]) + '</p>')
+			split = message['data'].split('\n')
 			# for ms in split:
 				# print(ms)
 				# print('</p><p>')
 			# print('</p>')
 
 			header = True
-			print('<h3> <b>Comando: </b>' + comando + ' - <b> Maquina: </b> ' + str(i) + '</h3>')
+			print('<h3> <b>Comando: </b>' + comando + ' - <b> Máquina: </b> ' + str(i) + '</h3>')
 			try:
 				for ms in split:
 					if (header and comando != 'uptime'):
@@ -69,7 +74,10 @@ for i in range (1,4):
 				print('<p></p>')
 			except Exception as e:
 				print('<p>' + e + '</p>')
-	print('</div>')
+	if (isInDiv):
+		print('</div>')
+		isInDiv = False
+
 			# print("Maq" + str(i) + " pediu " + comando.upper())
 			# try:
 			# 	print(form.getlist("maq1-" + comando)[0])
