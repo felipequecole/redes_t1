@@ -61,9 +61,9 @@ def parse_header(message):
 	identification = struct.unpack('!H', header.read(2))[0]
 	aux = struct.unpack('!H', header.read(2))[0]
 	flags = []
-	flags.append(aux & 0x80)
-	flags.append(aux & 0x40)
-	flags.append(aux & 0x20)
+	flags.append(aux & 0x80 >> 7)
+	flags.append(aux & 0x40 >> 6)
+	flags.append(aux & 0x20 >> 5)
 	aux = struct.unpack('!H', header.read(2))[0]
 	ttl = aux >> 8
 	protocol = aux & 0x00ff
