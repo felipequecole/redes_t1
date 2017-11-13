@@ -105,6 +105,8 @@ def parse_header(message):
 	check = headerChecksum.read(10)
 	headerChecksum.read(2)
 	check = check + headerChecksum.read()
+	if(check != 0xffff):
+		dados['data'] = 'Erro na verificação do checksum'
 	source = inet_ntoa(header.read(4))
 	destination = inet_ntoa(header.read(4))
 	header.read(4) # pular a parte de options (deve estar vazia)
