@@ -14,8 +14,23 @@ COMO RODAR:
 -> Primeiro, é necessário "ligar" o daemon, para isso, basta dar o comando "python daemon.py --port <Numero da porta> &" a partir da home
 -> Depois, basta acessar o http://192.168.56.103 e inserir os comandos
 
+WEBSERVER.PY
+Neste código é enviado para o backend.py as opções de comandos selecionados pelo usuário, para as respectivas máquinas com seus respectivos parâmetros.
+Este código também recebe o retorno da função "sendMsg" do backend.py e exibe em formato html o resultado dos comandos selecionados pelo usurio.
+
 BACKEND.PY
+Este código contém as seguintes funções:
+
 -> calc_checksum: recebe os dados a serem somados e um parametro que determina se aquele checksum é de quem está enviando ou de quem está recebendo a mensagem
 -> create_header: cria o cabeçalho que será enviado junto com a mensagem
 -> parse_header: faz o tratamento dos dados recebidos do daemon.py, inicializando as variáveis a partir do cabeçalho recebido, verificando o checksum
 -> sendMsg: nessa função é enviado a mensagem para o daemon e também é onde é esperado a sua resposta, fazendo o tratamento necessário caso precise.
+
+DAEMON.PY
+Neste código é criado os sockets e as threads de acordo com o especificado no projeto.
+Este código contém as seguintes funções:
+
+-> calc_checksum: recebe os dados a serem somados e um parametro que determina se aquele checksum é de quem está enviando ou de quem está recebendo a mensagem
+-> create_header: recebe a mensagem enviada pelo backend, o protocolo, o endereço de destino, o endereço de envio, o ttl e a identificação, e a partir destes valores cria o cabeçalho de retorno para o backend.py
+-> parse_header: faz o tratamento dos dados recebidos do backend.py, inicializando as variáveis a partir do cabeçalho recebido, verificando o checksum
+-> send_packet: recebe os dados do backend.py, analisa, roda o subcomando correspondente a mensagem e retorna o resultado do subcomendo para o backend.py
