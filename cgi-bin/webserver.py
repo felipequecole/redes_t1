@@ -43,15 +43,9 @@ for i in range (1,4):
 			except Exception as e:
 				message = {'data': 'Erro ao processar requisição. Verifique se o daemon está rodando.',
 							'cmd' : 'error'}
-				# raise
 
-			# for i in message.keys():
-			# 	print('<p>' + i + ' : '+str(message[i]) + '</p>')
 			split = message['data'].split('\n')
-			# for ms in split:
-				# print(ms)
-				# print('</p><p>')
-			# print('</p>')
+
 
 			header = True
 			print('<h3> <b>Comando: </b>' + comando + ' - <b> Máquina: </b> ' + str(i) + '</h3>')
@@ -90,11 +84,6 @@ for i in range (1,4):
 		print('</div>')
 		isInDiv = False
 
-			# print("Maq" + str(i) + " pediu " + comando.upper())
-			# try:
-			# 	print(form.getlist("maq1-" + comando)[0])
-			# except IndexError:
-		 # 		print("Nao tem numero")
 
 print('<div class="col-sm-12">')
 print('<p><a href=\"/\"> <button type=\"button\" class=\"btn btn-primary\">Voltar</button> </a></p>')

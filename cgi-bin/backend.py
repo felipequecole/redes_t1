@@ -4,21 +4,13 @@ from socket import *
 import struct
 from io import BytesIO
 
-# def carry_add(a,b):
-# 	c = a + b
-# 	return ((a + b & 0xffff) + (a + b >> 16))
-
 sequence = 0 # variavel global para identificar o pacote
 
 
 def calc_checksum(dados, op):
 	somaTotal = 0 #inicializa a soma total dos dados com 0
-	#  antes tava com passo 2
 	for i in range(0, len(dados)): #percorre a string de byte passada como parametro de 2 em 2 bytes (16 em 16 bits)
-		# palavra = ord(dados[i]) + (ord(dados[i+1]) << 8) #concatena 2 bytes formando uma palavra de 16 bits
-		# somaTotal = ((somaTotal + palavra & 0xffff) + (somaTotal + palavra >> 16)) #soma ao total a soma total a próxima palavra
 		somaTotal += ord(dados[i])
-		# s = carry_add(s, w)
 	if(op):
 		return somaTotal & 0xffff #retorna o valor da soma total sem invertir os bits
 	else:
@@ -31,66 +23,48 @@ def create_header(comando):
 	header = BytesIO()
 	comando = comando.split(' ')
 	options = ''
-	for i in range(len(comando)):
+	for i in range(len(comando)): # loop para ler e identificar cada argumento do comando
 		if(i != 0 and i != len(comando)-1):
 			options += comando[i] + ' '
 		if(i == len(comando)-1):
 			options += comando[i]
 	protocol_version = 2
-	ihl = 6 if (len(options) > 0) else 5
+	ihl = 6 if (len(options) > 0) else 5	# caso haja options, o cabeçalho contem 1 linha a mais (de 32 bits)
 	type_of_service = 0
-	total_length = 0 # calcular
 	global sequence
-	sequence += 1
+	sequence += 1 # pega o próximo da sequencia
 	ttl = 10	# valor arbitrário
 	protocol = int(comando[0])
 	source = inet_aton(gethostbyname(gethostname()))
 	destination = inet_aton(gethostbyname(gethostname())) # TODO: verificar como pegar esse IP
-
-	# header = struct.pack('!hhiQ', protocol_version, ihl, type_of_service, total_length)
-	# header += struct.pack('!Qccc', identification, '1', '1', '1')
-
-	# começa a escrever o cabeçalho
-	aux = ((protocol_version << 4) & 0xf0) | ihl
-	aux = (aux << 8) & 0xff00 | type_of_service
-	primeira_linha = struct.pack('!HH', aux, ihl*4)
+	total_length = (ihl * 4) + len(options)
+	aux = ((protocol_version << 4) & 0xf0) | ihl # coloca em aux os valores de versão do protocolo e ihl
+	aux = (aux << 8) & 0xff00 | type_of_service	# concatena com tipo de serviço
+	primeira_linha = struct.pack('!HH', aux, total_length)	# escreve a primeira linha do cabeçalho em bytes
 	segunda_linha = struct.pack('!HH', sequence, 0) 	# 0 porque é requisição + offset
-	aux = ((ttl << 8) & 0xff00) | protocol
+	aux = ((ttl << 8) & 0xff00) | protocol	# concatena ttl e protocolo
 	op_bin = ''
 	for char in options:
-		op_bin += struct.pack('!c', char)
+		op_bin += struct.pack('!c', char)	# converte as opções para bytes
 	aux_check = primeira_linha + segunda_linha + struct.pack('!H', aux) + source + destination + op_bin
 	terceira_linha = struct.pack('!HH', aux, calc_checksum(aux_check, 0))
-	header.write(primeira_linha)
+	header.write(primeira_linha)	# monta todo o cabeçalho
 	header.write(segunda_linha)
 	header.write(terceira_linha)
 	header.write(source)
 	header.write(destination)
 	header.write(op_bin)
-	header.seek(0)
-	return header.read()
+	header.seek(0)	# volta o ponteiro de leitura pra posiçao original
+	return header.read()	# retorna todo o conteúdo
 
-	# for p in range (5):
-	# 	header += struct.pack('!c', '0')
-	# headerChecksum = header
-	# for o in options:
-	# 	headerChecksum += struct.pack('!c', o)
-	# checksum = calc_checksum(headerChecksum+source+destination, 0)
-	# header += struct.pack('!iiQ', ttl, protocol, checksum)
-	# header += source
-	# header += destination
-	# # # TODO adicionar os address no header
-	# for o in options:
-	# 	header += struct.pack('!c', o)
-	# return header
-	# por enquanto vai ignorar a parte de source e dest address
 
+# Responsável por fazer o parse de mensagem recebida
 def parse_header(message):
 	header = BytesIO(message)
 	aux = struct.unpack('!H', header.read(2))[0]
-	protocol_version = (aux >> 8) >> 4
-	ihl = (aux >> 8) & 0x0f
-	ihl = aux & 0x00ff
+	protocol_version = (aux >> 8) >> 4	# faz o parse da versão do protocolo
+	ihl = (aux >> 8) & 0x0f	# e do ihl
+ 	type_of_service = aux & 0x00ff
  	total_length = struct.unpack('!H', header.read(2))[0]
 	identification = struct.unpack('!H', header.read(2))[0]
 	aux = struct.unpack('!H', header.read(2))[0]
@@ -129,13 +103,13 @@ def parse_header(message):
 			}
 
 def sendMsg(comando, maquina):
-	serverName = gethostname()
-	serverPort = 9000 + maquina  # ainda nao define a porta por parametro, fixei na 9003 para testes
+	serverName = gethostname()	# como tudo está rodando na mesma VM, pega o endereço local
+	serverPort = 9000 + maquina  # cada porta seria uma "máquina", então é aqui que é feita a seleção
 	dados = {}
-	clientSocket = socket(AF_INET,SOCK_STREAM)
+	clientSocket = socket(AF_INET,SOCK_STREAM)	# cria o socket
 	if (len(comando) > 0):
-		header = create_header(comando)
-		if (len(header) > 0):
+		header = create_header(comando) # cria o header para requisição
+		if (len(header) > 0):	#  se o header foi criado com sucesso, envia para o socket
 			try:
 				clientSocket.connect((serverName, serverPort))
 				clientSocket.send(header)

@@ -8,12 +8,8 @@ import thread
 
 def calc_checksum(dados, op):
 	somaTotal = 0 #inicializa a soma total dos dados com 0
-	#  antes tava com passo 2
-	for i in range(0, len(dados)): #percorre a string de byte passada como parametro de 2 em 2 bytes (16 em 16 bits)
-		# palavra = ord(dados[i]) + (ord(dados[i+1]) << 8) #concatena 2 bytes formando uma palavra de 16 bits
-		# somaTotal = ((somaTotal + palavra & 0xffff) + (somaTotal + palavra >> 16)) #soma ao total a soma total a próxima palavra
+	for i in range(0, len(dados)): #percorre a string de byte passada como parametro byte a byte, somando
 		somaTotal += ord(dados[i])
-		# s = carry_add(s, w)
 	if(op):
 		return somaTotal & 0xffff #retorna o valor da soma total sem invertir os bits
 	else:
@@ -26,16 +22,14 @@ def create_header(message, protocol, source, destination, ttl, identification):
 	protocol_version = 2
 	ihl = 5 	# tem o campo Data
 	type_of_service = 0
-	total_length = 0 # calcular
 	ttl = ttl - 1
-	# header = struct.pack('!hhiQ', protocol_version, ihl, type_of_service, total_length)
-	# header += struct.pack('!Qccc', identification, '1', '1', '1')
 
-	# começa a escrever o cabeçalho
+	# começa a escrever o cabeçalho (segue o mesmo padrão do backend.py)
 	aux = ((protocol_version << 4) & 0xf0) | ihl
 	aux = (aux << 8) & 0xff00 | type_of_service
-	primeira_linha = struct.pack('!HH', aux, ihl*4)
-	segunda_linha = struct.pack('!HH', identification, 0xe0) 	# 0xE0 response + offset
+	total_length = ihl*4 + len(message)
+	primeira_linha = struct.pack('!HH', aux, total_length)
+	segunda_linha = struct.pack('!HH', identification, 0xe0) 	# 0xE0 response+offset = [11100000]
 	aux = ((ttl << 8) & 0xff00) | protocol
 	op_bin = struct.pack('!Q', 0)
 	aux_check = primeira_linha + segunda_linha + struct.pack('!H', aux) + inet_aton(source) + inet_aton(destination)
@@ -51,6 +45,7 @@ def create_header(message, protocol, source, destination, ttl, identification):
 	return header.read()
 
 
+# Responsavel pelo parse do cabeçalho (segue a mesma lógica do contido no backend.py )
 def parse_header(message):
 	header = io.BytesIO(message)
 	aux = struct.unpack('!H', header.read(2))[0]
@@ -80,7 +75,7 @@ def parse_header(message):
 	while(aux != ''):
 		args += aux
 		aux = header.read(1)
-	if(check != 0xffff):
+	if(check != 0xffff): # verifica se o checksum está correto, se não estiver, seta as flags
 		flags[0] = 0
 		flags[1] = 1
 		flags[2] = 1
@@ -93,33 +88,17 @@ def parse_header(message):
 			'destination': destination
 			}
 
-	# ihl = str(struct.unpack('!h',header.read(2))[0])
-	# type_of_service = str(struct.unpack('!i', header.read(4))[0])
-	# total_length = str(struct.unpack('!Q', header.read(8))[0])
-	# identification = str(struct.unpack('!Q', header.read(8))[0])
-	# flags = []
-	# for i in range(3):
-	# 	flags.append(str(struct.unpack('!c', header.read(1))[0]))
-	# offset = []
-	# for j in range(5):
-	# 	offset.append(str(struct.unpack('!c', header.read(1))[0]))
-	# ttl = str(struct.unpack('!i', header.read(4))[0])
-	# sentence = str(struct.unpack('!i', header.read(4))[0])
-	# sentence += '  '
-	# print sentence
-	# checksum = str(struct.unpack('!Q', header.read(8))[0])
-	# soucer = inet_ntoa(header.read(4))
-	# dest = inet_ntoa(header.read(4))
-	# print dest
-	# op = header.read()
-	# cmd = ''
-	# for i in op:
-	# 	cmd += str(struct.unpack('!c', i)[0])
-	# 	print cmd
-	# sentence += cmd
-	# return sentence
 
+# Responsavel por rodar o comando
 def send_packet(socket):
+	ps = "1 "
+	df = "2 "
+	finger = "3 "
+	uptime = "4 "
+	bar = "|"
+	pv = ";"
+	maior = ">"
+	menor = "<"
 	packet = socket.recv(1024)
 	mensagem = parse_header(packet)
 	comando = mensagem['cmd'] # TODO colocar espaco no parse
@@ -142,40 +121,33 @@ def send_packet(socket):
 
 	# executa num subcomando
 	subprocesso = subprocess.Popen(comando, stdout=subprocess.PIPE, shell=True)
+	# recebe a resposta
 	(resposta, err) = subprocesso.communicate()
-	if (mensagem['ttl'] > 0):
+	if (mensagem['ttl'] > 0): # se o ttl ainda não zerou, cria a resposta com o retorno do comando
 		resposta = create_header(resposta, mensagem['protocol'], mensagem['destination'],
 								mensagem['source'], mensagem['ttl'], mensagem['identification'])
-	else:
+	else: # senao, envia mensagem de erro
 		resposta = create_header('Seu pacote foi rejeitado (TTL = 0)', mensagem['protocol'], mensagem['destination'],
 								mensagem['source'], mensagem['ttl'], mensagem['identification'])
-	connectionSocket.send(resposta)
-	connectionSocket.close()
+	connectionSocket.send(resposta) # envia mensagem para o socket
+	connectionSocket.close() 	# fecha conexão
 
 
 
-serverPort = 9001
+serverPort = 9001	# porta padrão, caso não seja passado por argumento
 try:
 	if(sys.argv[1] == '--port'):
 		serverPort = int(sys.argv[2])
 except Exception:
-	serverPort += 1
+	pass
 
 #Criando socket TCP
 serverSocket = socket(AF_INET,SOCK_STREAM)
 #Associando a porta 9003 com o socket do servidor
 serverSocket.bind(("",serverPort))
 #Espera pelos pacotes do cliente
-serverSocket.listen(1)
+serverSocket.listen(5)
 
-ps = "1 "
-df = "2 "
-finger = "3 "
-uptime = "4 "
-bar = "|"
-pv = ";"
-maior = ">"
-menor = "<"
 
 
 while True:
