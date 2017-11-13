@@ -68,6 +68,11 @@ def parse_header(message):
 	ttl = aux >> 8
 	protocol = aux & 0x00ff
 	checksum = struct.unpack('!H', header.read(2))[0]
+	headerChecksum = io.BytesIO(message)
+	check = headerChecksum.read(10)
+	headerChecksum.read(2)
+	check = check + headerChecksum.read()
+	check = hex(calc_checksum(check,1)+checksum))
 	source = inet_ntoa(header.read(4))
 	destination = inet_ntoa(header.read(4))
 	aux = header.read(1)
