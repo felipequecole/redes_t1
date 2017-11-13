@@ -72,7 +72,7 @@ def parse_header(message):
 	check = headerChecksum.read(10)
 	headerChecksum.read(2)
 	check = check + headerChecksum.read()
-	check = hex(calc_checksum(check,1)+checksum)
+	check = calc_checksum(check,1)+checksum
 	source = inet_ntoa(header.read(4))
 	destination = inet_ntoa(header.read(4))
 	aux = header.read(1)

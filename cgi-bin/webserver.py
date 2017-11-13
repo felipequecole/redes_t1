@@ -40,6 +40,7 @@ for i in range (1,4):
 			except Exception as e:
 				message = {'data': 'Erro ao processar requisição. Verifique se o daemon está rodando.',
 							'cmd' : 'error'}
+				raise
 
 			for i in message.keys():
 				print('<p>' + i + ' : '+str(message[i]) + '</p>')

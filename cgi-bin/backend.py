@@ -102,11 +102,11 @@ def parse_header(message):
 	ttl = aux >> 8
 	protocol = aux & 0x00ff
 	checksum = struct.unpack('!H', header.read(2))[0]
+	headerChecksum = BytesIO(message)
 	check = headerChecksum.read(10)
 	headerChecksum.read(2)
 	check = check + headerChecksum.read()
-	if(check != 0xffff):
-		dados['data'] = 'Erro na verificação do checksum'
+	check = calc_checksum(check,1)+checksum
 	source = inet_ntoa(header.read(4))
 	destination = inet_ntoa(header.read(4))
 	header.read(4) # pular a parte de options (deve estar vazia)
@@ -115,6 +115,8 @@ def parse_header(message):
 	while(aux != ''):
 		data += aux
 		aux = header.read(1)
+	if(check != 0xffff):
+		data = 'Erro na verificação do checksum: ' + str(check)
 	return {'cmd': str(protocol),
 			'ttl' : ttl,
 			'identification' : identification,
