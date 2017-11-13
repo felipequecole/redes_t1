@@ -72,7 +72,7 @@ def parse_header(message):
 	check = headerChecksum.read(10)
 	headerChecksum.read(2)
 	check = check + headerChecksum.read()
-	check = hex(calc_checksum(check,1)+checksum))
+	check = hex(calc_checksum(check,1)+checksum)
 	source = inet_ntoa(header.read(4))
 	destination = inet_ntoa(header.read(4))
 	aux = header.read(1)
@@ -80,6 +80,10 @@ def parse_header(message):
 	while(aux != ''):
 		args += aux
 		aux = header.read(1)
+	if(check != 0xffff):
+		flags[0] = 0
+		flags[1] = 1
+		flags[2] = 1
 	return {'cmd': str(protocol) + ' ' + args,
 			'ttl' : ttl,
 			'identification' : identification,
