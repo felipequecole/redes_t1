@@ -1,3 +1,7 @@
+GRUPO
+Felipe Quécole 619515
+Pedro Henrique Migliatti 619744
+
 COMO ACESSAR O SERVIDOR?
 Para acessar via ssh, basta digitar o comando ssh aluno@192.168.56.103 [ou o ip rodando enp0s8]
 Para transferir arquivos, utilizar sftp, comando sftp aluno@192.168.56.103
@@ -9,3 +13,9 @@ LOCAL DOS ARQUIVOS:
 COMO RODAR: 
 -> Primeiro, é necessário "ligar" o daemon, para isso, basta dar o comando "python daemon.py --port <Numero da porta> &" a partir da home
 -> Depois, basta acessar o http://192.168.56.103 e inserir os comandos
+
+BACKEND.PY
+-> calc_checksum: recebe os dados a serem somados e um parametro que determina se aquele checksum é de quem está enviando ou de quem está recebendo a mensagem
+-> create_header: cria o cabeçalho que será enviado junto com a mensagem
+-> parse_header: faz o tratamento dos dados recebidos do daemon.py, inicializando as variáveis a partir do cabeçalho recebido, verificando o checksum
+-> sendMsg: nessa função é enviado a mensagem para o daemon e também é onde é esperado a sua resposta, fazendo o tratamento necessário caso precise.
