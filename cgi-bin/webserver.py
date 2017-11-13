@@ -39,7 +39,7 @@ for i in range (1,4):
 					message = backend.sendMsg(comandos[comando], i)
 			except Exception as e:
 				message = {'data': 'Erro ao processar requisição. Verifique se o daemon está rodando.',
-							'comando' : 'error'}
+							'cmd' : 'error'}
 
 			for i in message.keys():
 				print('<p>' + i + ' : '+str(message[i]) + '</p>')
@@ -53,7 +53,7 @@ for i in range (1,4):
 			print('<h3> <b>Comando: </b>' + comando + ' - <b> Máquina: </b> ' + str(i) + '</h3>')
 			try:
 				for ms in split:
-					if (header and comando != 'uptime' and message['comando'] != 'error'):
+					if (header and comando != 'uptime' and message['cmd'] != 'error'):
 						header = False
 						print ('<table class="table">')
 						print('<thead class="thead-dark">')
@@ -64,7 +64,7 @@ for i in range (1,4):
 						print('</tr>')
 						print('</thead>')
 						print('<tbody>')
-					elif (comando != 'uptime' and message['comando'] != 'error'):
+					elif (comando != 'uptime' and message['cmd'] != 'error'):
 						print('<tr>')
 						for part in ms.split(' '):
 							if (part != ''):
@@ -74,7 +74,7 @@ for i in range (1,4):
 						print('<p>')
 						print(ms)
 						print('</p>')
-				if (comando != 'uptime' and message['comando'] != 'error'):
+				if (comando != 'uptime' and message['cmd'] != 'error'):
 					print('</tbody></table>')
 				print('<p></p>')
 			except Exception as e:
