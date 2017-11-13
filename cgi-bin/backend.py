@@ -105,7 +105,7 @@ def parse_header(message):
 	headerChecksum = BytesIO(message)
 	check = headerChecksum.read(10)
 	headerChecksum.read(2)
-	check = check + headerChecksum.read()
+	check = check + headerChecksum.read(8)
 	check = calc_checksum(check,1)+checksum
 	source = inet_ntoa(header.read(4))
 	destination = inet_ntoa(header.read(4))
@@ -116,7 +116,7 @@ def parse_header(message):
 		data += aux
 		aux = header.read(1)
 	if(check != 0xffff):
-		data = 'Erro na verificação do checksum: ' + str(check)
+		data = 'Erro na verificação do checksum: ' + str(checksum)
 	return {'cmd': str(protocol),
 			'ttl' : ttl,
 			'identification' : identification,

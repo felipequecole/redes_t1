@@ -38,7 +38,7 @@ def create_header(message, protocol, source, destination, ttl, identification):
 	segunda_linha = struct.pack('!HH', identification, 0xe0) 	# 0xE0 response + offset
 	aux = ((ttl << 8) & 0xff00) | protocol
 	op_bin = struct.pack('!Q', 0)
-	aux_check = primeira_linha + segunda_linha + struct.pack('!H', aux) + source + destination
+	aux_check = primeira_linha + segunda_linha + struct.pack('!H', aux) + inet_aton(source) + inet_aton(destination)
 	terceira_linha = struct.pack('!hH', aux, calc_checksum(aux_check, 0))
 	header.write(primeira_linha)
 	header.write(segunda_linha)

@@ -26,6 +26,7 @@ comandos = {
 
 for i in range (1,4):
 	isInDiv = False
+	gambiarraPS = False
 	for comando in comandos:
 		if ('maq' + str(i) + '_' + comando) in form:
 			if (isInDiv == False):
@@ -37,13 +38,15 @@ for i in range (1,4):
 					message = backend.sendMsg(comandos[comando] +' '+' '+ form.getvalue('maq' + str(i) + '-' + comando), i)
 				else:
 					message = backend.sendMsg(comandos[comando], i)
+					if (comando == 'ps'):
+						gambiarraPS = True
 			except Exception as e:
 				message = {'data': 'Erro ao processar requisição. Verifique se o daemon está rodando.',
 							'cmd' : 'error'}
-				raise
+				# raise
 
-			for i in message.keys():
-				print('<p>' + i + ' : '+str(message[i]) + '</p>')
+			# for i in message.keys():
+			# 	print('<p>' + i + ' : '+str(message[i]) + '</p>')
 			split = message['data'].split('\n')
 			# for ms in split:
 				# print(ms)
@@ -61,6 +64,9 @@ for i in range (1,4):
 						print('<tr>')
 						for part in ms.split(' '):
 							if (part != ''):
+								if (gambiarraPS):
+									gambiarraPS = False
+									continue
 								print('<th scope="col">' + part + '</th>')
 						print('</tr>')
 						print('</thead>')
