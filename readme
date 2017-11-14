@@ -33,4 +33,4 @@ Este código contém as seguintes funções:
 -> calc_checksum: recebe os dados a serem somados e um parametro que determina se aquele checksum é de quem está enviando ou de quem está recebendo a mensagem
 -> create_header: recebe a mensagem enviada pelo backend, o protocolo, o endereço de destino, o endereço de envio, o ttl e a identificação, e a partir destes valores cria o cabeçalho de retorno para o backend.py
 -> parse_header: faz o tratamento dos dados recebidos do backend.py, inicializando as variáveis a partir do cabeçalho recebido, verificando o checksum
--> send_packet: recebe os dados do backend.py, analisa, roda o subcomando correspondente a mensagem e retorna o resultado do subcomendo para o backend.py
+-> send_packet: recebe os dados do backend.py, analisa, roda o subcomando correspondente a mensagem e retorna o resultado do subcomando para o backend.py
