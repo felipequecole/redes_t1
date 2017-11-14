@@ -3,7 +3,7 @@ Felipe Quécole 619515
 Pedro Henrique Migliatti 619744
 
 COMO ACESSAR O SERVIDOR?
-Para acessar via ssh, basta digitar o comando ssh aluno@192.168.56.103 [ou o ip rodando enp0s8]
+Para acessar via ssh, basta digitar o comando ssh aluno@192.168.56.103 (este IP pode variar de acordo com a máquina onde o servidor está sendo rodadao, para verificar o ip rodando é só dar o comando "ifconfig e verificar se está rodando o enp0s8)
 Para transferir arquivos, utilizar sftp, comando sftp aluno@192.168.56.103
 
 LOCAL DOS ARQUIVOS:
